@@ -1,0 +1,26 @@
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  cache = FALSE,
+  fig.align = "center"
+  #fig.width= 10,
+  #fig.height=5
+)
+library(readxl)
+netflix= read.csv("Final_Project_FlixGem.csv")
+netflix= netflix[complete.cases(netflix),]
+netflix$Director= as.factor(netflix$Director)
+netflix$Hidden.Gem.Score= round(netflix$Hidden.Gem.Score)
+summary(netflix[,c(6,9)])
+h_index=function(movie_scores){
+  if(max(movie_scores) ==0) return(0)
+  movie_scores= movie_scores[order(movie_scores, decreasing = TRUE)]
+  tail(which(movie_scores >= seq_along(movie_scores)), 1)
+}
+H_index_df = data.frame(Directors= unique(netflix$Director), h_index = NA)
+for(i in 1:nrow(H_index_df)){
+  H_index_df$h_index[i] = h_index(netflix$Hidden.Gem.Score[netflix$Director == H_index_df$Directors[i]])
+}
+H_index_df = H_index_df[order(H_index_df$h_index, decreasing = TRUE),]
+head(H_index_df, 10)
